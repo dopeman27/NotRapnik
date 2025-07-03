@@ -1,11 +1,14 @@
 from flask import Flask, request, jsonify
+import jinja2
+
+
 
 app = Flask(__name__)
 
 @app.route('/')
 
 def home():
-    return "Welcome to the Flask App!"
+    return "<html><body><h1>Welcome to NotRapnik!</h1><p>This is a simple Flask application.</p></body></html>"
 
 @app.route('/api/data', methods=['GET'])
 

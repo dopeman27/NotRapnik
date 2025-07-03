@@ -1,0 +1,30 @@
+Strona internetowa z notatnikiem do pisania tekstów rapowych. 
+Features:
+
+must have:
+- tworzenie konta, na login i haslo, firebase 
+- zapisywanie notatek na swoim koncie
+- shareowanie notatek na status publiczny, widoczny dla wszystkich pod linkiem
+
+* NOTATNIK:
+- licznik sylab
+- licznik wersów
+- licznik zwrotek
+- numeracja wierszy
+- słownik rymow
+- odtwarzacz yt/soundclouda/mp3 z dysku - do słuchania bitu w kółko przy pisaniu tekstu
+
+
+should have:
+- najlepsze teksty na stronie glownej
+
+*NOTATNIK:
+- auto podpowiadanie rymow
+
+
+could have:
+- api do słowników j.polskiego, rymów, związków frazeologicznych, związków stylistycznych, synonimów, ...itd.
+- pomocnik słownikowy: odmiana wyrazu, synonimy, antonimy, ...itd.
+- narzędzia do pisania, np. związki stylistyczne
+- podlaczenie do ai, praca z asystentem na biezaco
+- inne ciekawe narzedzia, np. skojarzenia itd.
