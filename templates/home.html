@@ -3,5 +3,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <div class="centered-text">test</div>
+  <div class="centered-text">
+    test
+  </div>
+  <div class="centered-text">
+    <a href="{{ url_for('notes') }}" class="btn">Notatki</a>
+  </div>
 {% endblock %}
+

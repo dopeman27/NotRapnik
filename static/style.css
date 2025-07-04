@@ -32,6 +32,22 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 80vh;
+  flex-direction: column;
+  height: 60vh;
   font-size: 2rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  margin-top: 20px;
+  background-color: #007bff;
+  color: #fff;
+  text-decoration: none;
+  font-size: 1rem;
+  border-radius: 4px;
+}
+
+.btn:hover {
+  opacity: 0.9;
 }
