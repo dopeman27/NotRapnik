@@ -1,11 +1,12 @@
-<!-- templates/home.html -->
-
 {% extends 'base.html' %}
 
 {% block content %}
-  <div class="centered">
-    <a class="btn" href="{{ url_for('notes') }}">Przejdź do notatek</a>
+  <div class="home-wrapper">
+    <button class="btn-new">Utwórz nową notatkę</button>
+    <div class="notes-container">
+      <button class="note-item">Testowa notatka 1<span class="trash-btn">🗑️</span></button>
+      <button class="note-item">Druga notatka próbna<span class="trash-btn">🗑️</span></button>
+      <button class="note-item">Przykład notatki 3<span class="trash-btn">🗑️</span></button>
+    </div>
   </div>
 {% endblock %}
-
-

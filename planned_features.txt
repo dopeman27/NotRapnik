@@ -28,3 +28,6 @@ could have:
 - narzędzia do pisania, np. związki stylistyczne
 - podlaczenie do ai, praca z asystentem na biezaco
 - inne ciekawe narzedzia, np. skojarzenia itd.
+
+
+Ważne żeby aplikacja działała i na komputer i na telefon
