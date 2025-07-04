@@ -1,3 +1,4 @@
+<!-- templates/base.html -->
 <!doctype html>
 <html lang="pl">
 <head>
@@ -9,17 +10,17 @@
 <body>
   <header>
     <nav class="navbar">
-      <ul class="nav-left">
-        <li><a href="{{ url_for('notes') }}">Notatki</a></li>
-      </ul>
-      <div class="nav-center">
-        <a class="btn-center" href="{{ url_for('home') }}">Home</a>
+      <div class="nav-left">
+        <div class="logo">LOGO</div>
       </div>
-      <ul class="nav-right">
-        <li><a href="{{ url_for('login') }}">Login</a></li>
-        <li><a href="{{ url_for('signup') }}">Sign up</a></li>
-        <li><a href="#">Logout</a></li>
-      </ul>
+      <div class="nav-center">
+        <a class="title" href="{{ url_for('home') }}">Strona notatek</a>
+      </div>
+      <div class="nav-right">
+        <a href="{{ url_for('login') }}">Login</a>
+        <a href="{{ url_for('signup') }}">Sign up</a>
+        <a href="#">Logout</a>
+      </div>
     </nav>
   </header>
   <main>
