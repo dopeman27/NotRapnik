@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <div class="centered-text">
-    login
-  </div>
+  <h2>Logowanie</h2>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.email.label }} {{ form.email() }}<br>
+    {{ form.password.label }} {{ form.password() }}<br>
+    {{ form.submit() }}
+  </form>
 {% endblock %}

@@ -1,22 +1,16 @@
-from flask import Flask, render_template, url_for
+from flask import Flask
+from config import Config
+from extensions import db, migrate, login
+from routes import bp as main_bp
 
 app = Flask(__name__)
+app.config.from_object(Config)
 
-@app.route('/')
-def home():
-    return render_template('home.html')
+db.init_app(app)
+migrate.init_app(app, db)
+login.init_app(app)
 
-@app.route('/notes')
-def notes():
-    return render_template('notes.html')
-
-@app.route('/login')
-def login():
-    return render_template('login.html')
-
-@app.route('/signup')
-def signup():
-    return render_template('signup.html')
+app.register_blueprint(main_bp)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,12 +1,35 @@
 {% extends 'base.html' %}
-
 {% block content %}
   <div class="home-wrapper">
-    <button class="btn-new">Utwórz nową notatkę</button>
-    <div class="notes-container">
-      <button class="note-item">Testowa notatka 1<span class="trash-btn">🗑️</span></button>
-      <button class="note-item">Druga notatka próbna<span class="trash-btn">🗑️</span></button>
-      <button class="note-item">Przykład notatki 3<span class="trash-btn">🗑️</span></button>
+    <button id="btn-new" class="btn-new">Utwórz nową notatkę</button>
+    <div class="notes-list">
+      {% for note in notes %}
+      <div class="note-item">
+        <a href="{{ url_for('main.view_note', note_id=note.id) }}" class="note-link">
+          {{ note.title }}
+        </a>
+        <form method="POST" action="{{ url_for('main.delete_note', note_id=note.id) }}" class="trash-form">
+          <button type="submit" class="trash-btn">🗑️</button>
+        </form>
+      </div>
+      {% endfor %}
     </div>
+    
+<script>
+  // Sprawdzanie, czy skrypt znajduje przycisk
+  const btnNew = document.getElementById('btn-new');
+  if (!btnNew) {
+    console.error('Nie znalazłem #btn-new – sprawdź id w HTML!');
+  } else {
+    btnNew.addEventListener('click', () => {
+      fetch('/api/notes', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+          window.location.href = '/notes/' + data.id;
+        })
+        .catch(err => console.error('Błąd przy tworzeniu notatki:', err));
+    });
+  }
+</script>
   </div>
 {% endblock %}
