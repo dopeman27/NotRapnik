@@ -31,3 +31,4 @@ could have:
 
 
 Ważne żeby aplikacja działała i na komputer i na telefon
+Dodać stronę główną która będzie prezentować aplikacje (żeby użytkownik nie był od razu zmuszany do rejestracji itp tylko żeby mógł się zapoznać)
