@@ -1,6 +1,51 @@
 {% extends 'base.html' %}
 {% block head %}
   <link rel="stylesheet" href="{{ url_for('static', filename='note.css') }}">
+  <style>
+    .rows {
+      background: #222;
+      color: #888;
+      font-family: monospace;
+      font-size: 1.15rem;
+      line-height: 1.5;
+      padding: 0.2em 0.5em;
+      text-align: right;
+      width: 3em;
+      user-select: none;
+      float: left;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    textarea#textBox {
+      background: #222;
+      color: #fff;
+      font-family: sans-serif;
+      font-size: 1.15rem;
+      line-height: 1.5;
+      border: none;
+      resize: none;
+      outline: none;
+      width: calc(100% - 3em);
+      overflow: hidden;
+      float: left;
+      box-sizing: border-box;
+      min-height: calc(14 * 1.5em);
+      height: calc(14 * 1.5em);
+    }
+    #copyText {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+      visibility: hidden;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: sans-serif;
+      font-size: 1.15rem;
+      line-height: 1.5;
+      width: calc(100% - 3em);
+      box-sizing: border-box;
+    }
+  </style>
 {% endblock %}
 
 {% block content %}
@@ -22,9 +67,13 @@
 
     <h1 id="note-title" class="note-title" contenteditable>{{ note.title }}</h1>
 
-    <div class="note-body-wrapper">
+    <div class="note-body-wrapper" style="clear:both; overflow:hidden;">
       <span class="note-label">Treść</span>
-      <div id="note-body" class="note-body" contenteditable>{{ note.body }}</div>
+      <div class="note-body-container">
+        <div class="rows" id="numbers"></div>
+        <textarea id="textBox">{{ note.body }}</textarea>
+        <div id="copyText"></div>
+      </div>
     </div>
   </div>
 
@@ -41,42 +90,87 @@
 </div>
 
 <script>
-  function debounce(fn, d){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),d);}};
+  const nmbrBox = document.getElementById('numbers');
+  const txtBox  = document.getElementById('textBox');
+  const divCopy = document.getElementById('copyText');
+  const sizeIn  = document.getElementById('font-size');
+  const stanzas = document.getElementById('count-stanzas');
+  const lines   = document.getElementById('count-lines');
+  const words   = document.getElementById('count-words');
 
-  const body   = document.getElementById('note-body');
-  const title  = document.getElementById('note-title');
-  const sizeIn = document.getElementById('font-size');
-  const sSpan  = id => document.getElementById(id);
-  const stanzas = sSpan('count-stanzas');
-  const lines   = sSpan('count-lines');
-  const words   = sSpan('count-words');
+  function debounce(fn, delay) {
+    let t;
+    return (...args) => {
+      clearTimeout(t);
+      t = setTimeout(() => fn(...args), delay);
+    };
+  }
+
+  function copyText() {
+    let txt = txtBox.value.replace(/(?:\r\n|\r|\n)/g, '<br />');
+    divCopy.innerHTML = txt;
+  }
+
+  function addLines() {
+    copyText();
+
+    const lineHeight  = parseFloat(getComputedStyle(txtBox).lineHeight);
+    const mirrorH     = divCopy.offsetHeight;
+    const linesCount  = Math.max(1, Math.round(mirrorH / lineHeight));
+
+    let holder = '';
+    for (let i = 1; i <= linesCount; i++) {
+      holder += `<div class="row">${i}.</div>`;
+    }
+    nmbrBox.innerHTML = holder;
+
+    txtBox.style.height = 'auto';
+    const scrollH = txtBox.scrollHeight;
+    const minH    = lineHeight * 14;
+    const newH    = Math.max(scrollH, minH);
+
+    txtBox.style.height  = newH + 'px';
+    nmbrBox.style.height = newH + 'px';
+  }
 
   const save = debounce(() => {
     fetch('/api/notes/{{ note.id }}', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: title.innerText, body: body.innerText })
+      body: JSON.stringify({
+        title: document.getElementById('note-title').innerText,
+        body: txtBox.value
+      })
     });
   }, 500);
 
-  title.addEventListener('input', save);
-  body .addEventListener('input', () => { save(); counts(); });
-
-  sizeIn.addEventListener('input', () => {
-    body.style.fontSize  = sizeIn.value + 'px';
-    title.style.fontSize = (+sizeIn.value + 4) + 'px';
-  });
-
-  function counts(){
-    const txt = body.innerText.trim();
-    stanzas.textContent = txt ? txt.split(/\n\s*\n/).length : 0;
-    lines  .textContent = txt ? txt.split(/\n/).length       : 0;
-    words  .textContent = txt ? txt.split(/\s+/).filter(w=>w).length : 0;
+  function counts() {
+    const txt = txtBox.value;
+    stanzas.textContent = txt.trim() ? txt.split(/\n\s*\n/).length : 0;
+    lines.textContent   = txt ? txt.split(/\n/).length : 0;
+    words.textContent   = txt.trim() ? txt.trim().split(/\s+/).length : 0;
+    save();
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    body.style.fontSize  = sizeIn.value + 'px';
-    title.style.fontSize = (+sizeIn.value + 4) + 'px';
+  function addEvents() {
+    txtBox.addEventListener('input', () => {
+      addLines();
+      counts();
+    });
+    sizeIn.addEventListener('input', () => {
+      const fs = sizeIn.value + 'px';
+      [txtBox, nmbrBox, divCopy].forEach(el => {
+        el.style.fontSize   = fs;
+        el.style.lineHeight = '1.5';
+      });
+      addLines();
+      counts();
+    });
+  }
+
+  window.addEventListener('load', () => {
+    addEvents();
+    addLines();
     counts();
   });
 </script>
