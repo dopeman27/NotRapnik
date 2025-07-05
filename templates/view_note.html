@@ -1,12 +1,13 @@
-
 {% extends 'base.html' %}
+
 {% block content %}
+<div class="note-page">
   <div class="note-container">
     <div class="note-header">
-  <span class="note-label">Tytuł</span>
+      <span class="note-label">Tytuł</span>
       <div class="note-dates">
         <span>Utworzone: {{ note.created_at.strftime('%Y-%m-%d %H:%M') }}</span><br>
-        <span>Ostatnia modyfikacja: 
+        <span>Ostatnia modyfikacja:
           {% if note.updated_at %}
             {{ note.updated_at.strftime('%Y-%m-%d %H:%M') }}
           {% else %}
@@ -16,37 +17,64 @@
       </div>
     </div>
 
-    <h1 contenteditable id="note-title" class="note-title">{{ note.title }}</h1>
+    <h1 id="note-title" class="note-title" contenteditable>{{ note.title }}</h1>
 
     <div class="note-body-wrapper">
       <span class="note-label">Treść</span>
-      <div contenteditable id="note-body" class="note-body">{{ note.body }}</div>
+      <div id="note-body" class="note-body" contenteditable>{{ note.body }}</div>
     </div>
   </div>
 
-  <script>
-    function debounce(fn, delay) {
-      let t;
-      return (...args) => {
-        clearTimeout(t);
-        t = setTimeout(() => fn(...args), delay);
-      };
-    }
+  <aside class="note-sidebar">
+    <label for="font-size">Rozmiar czcionki:</label>
+    <input id="font-size" type="number" min="12" max="48" step="1" value="18">
 
-    const save = debounce(() => {
-      fetch('/api/notes/{{ note.id }}', {
-        method: 'PATCH',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          title: document.getElementById('note-title').innerText,
-          body: document.getElementById('note-body').innerText
-        })
-      });
-    }, 500);
+    <div class="counters">
+      <div>Strof:  <span id="count-stanzas">0</span></div>
+      <div>Wersów: <span id="count-lines">0</span></div>
+      <div>Słów:   <span id="count-words">0</span></div>
+    </div>
+  </aside>
+</div>
 
-    document.getElementById('note-title')
-            .addEventListener('input', save);
-    document.getElementById('note-body')
-            .addEventListener('input', save);
-  </script>
+<script>
+  function debounce(fn, d){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),d);}};
+
+  const body   = document.getElementById('note-body');
+  const title  = document.getElementById('note-title');
+  const sizeIn = document.getElementById('font-size');
+  const sSpan  = id => document.getElementById(id);
+  const stanzas = sSpan('count-stanzas');
+  const lines   = sSpan('count-lines');
+  const words   = sSpan('count-words');
+
+  const save = debounce(() => {
+    fetch('/api/notes/{{ note.id }}', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: title.innerText, body: body.innerText })
+    });
+  }, 500);
+
+  title.addEventListener('input', save);
+  body .addEventListener('input', () => { save(); counts(); });
+
+  sizeIn.addEventListener('input', () => {
+    body.style.fontSize  = sizeIn.value + 'px';
+    title.style.fontSize = (+sizeIn.value + 4) + 'px';
+  });
+
+  function counts(){
+    const txt = body.innerText.trim();
+    stanzas.textContent = txt ? txt.split(/\n\s*\n/).length : 0;
+    lines  .textContent = txt ? txt.split(/\n/).length       : 0;
+    words  .textContent = txt ? txt.split(/\s+/).filter(w=>w).length : 0;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    body.style.fontSize  = sizeIn.value + 'px';
+    title.style.fontSize = (+sizeIn.value + 4) + 'px';
+    counts();
+  });
+</script>
 {% endblock %}
