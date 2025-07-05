@@ -1,0 +1,37 @@
+.public-wrapper {
+  text-align: center;
+  margin: 80px auto;
+  max-width: 500px;
+  color: #fff;
+}
+
+.public-wrapper h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+.public-wrapper p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+}
+
+.public-actions .btn {
+  display: inline-block;
+  padding: 10px 20px;
+  margin: 0 10px;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #fff;
+}
+.btn-primary {
+  background: #287bde;
+}
+.btn-secondary {
+  background: #444;
+}
+.btn-primary:hover {
+  background: #1f65b0;
+}
+.btn-secondary:hover {
+  background: #555;
+}

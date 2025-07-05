@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+{% endblock %}
+
 {% block content %}
   <div class="home-wrapper">
     <button id="btn-new" class="btn-new">Utwórz nową notatkę</button>
@@ -8,12 +13,15 @@
         <a href="{{ url_for('main.view_note', note_id=note.id) }}" class="note-link">
           {{ note.title }}
         </a>
-        <form method="POST" action="{{ url_for('main.delete_note', note_id=note.id) }}" class="trash-form">
+        <form method="POST"
+              action="{{ url_for('main.delete_note', note_id=note.id) }}"
+              class="trash-form">
           <button type="submit" class="trash-btn">🗑️</button>
         </form>
       </div>
       {% endfor %}
     </div>
+  </div>
     
 <script>
   // Sprawdzanie, czy skrypt znajduje przycisk
