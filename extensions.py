@@ -6,3 +6,4 @@ db       = SQLAlchemy()
 migrate  = Migrate()
 login    = LoginManager()
 login.login_view = 'main.login'
+

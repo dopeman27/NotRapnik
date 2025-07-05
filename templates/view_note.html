@@ -1,15 +1,21 @@
 
-#Auto zapis podczas pisania
 {% extends 'base.html' %}
 {% block content %}
   <div class="note-container">
     <div class="note-header">
-      <span class="note-label">Tytuł</span>
+  <span class="note-label">Tytuł</span>
       <div class="note-dates">
         <span>Utworzone: {{ note.created_at.strftime('%Y-%m-%d %H:%M') }}</span><br>
-        <span>Ostatnia modyfikacja: {{ note.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+        <span>Ostatnia modyfikacja: 
+          {% if note.updated_at %}
+            {{ note.updated_at.strftime('%Y-%m-%d %H:%M') }}
+          {% else %}
+            {{ note.created_at.strftime('%Y-%m-%d %H:%M') }}
+          {% endif %}
+        </span>
       </div>
     </div>
+
     <h1 contenteditable id="note-title" class="note-title">{{ note.title }}</h1>
 
     <div class="note-body-wrapper">
