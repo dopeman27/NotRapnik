@@ -45,10 +45,16 @@ def logout():
 
 # --- NOTES ---
 @bp.route('/')
-@login_required
 def home():
-    notes = current_user.notes.order_by(Note.created_at.desc()).all()
-    return render_template('home.html', notes=notes)
+    if current_user.is_authenticated:
+        notes = current_user.notes.order_by(Note.created_at.desc()).all()
+        return render_template('home.html', notes=notes)
+    else:
+        return render_template('public_home.html')
+    
+@bp.route('/welcome')
+def public_home():
+    return render_template('public_home.html')
 
 @bp.route('/api/notes', methods=['POST'])
 @login_required

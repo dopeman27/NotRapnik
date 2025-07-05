@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="public-wrapper">
+    <h1>Witaj w NotRapnik!</h1>
+    <p>To jest Twoje miejsce na szybkie notatki. Zaloguj się lub zarejestruj, aby zacząć je tworzyć i edytować.</p>
+    <div class="public-actions">
+      <a href="{{ url_for('main.login') }}" class="btn btn-primary">Zaloguj się</a>
+      <a href="{{ url_for('main.signup') }}" class="btn btn-secondary">Zarejestruj się</a>
+    </div>
+  </div>
+{% endblock %}

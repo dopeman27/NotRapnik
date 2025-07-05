@@ -9,17 +9,23 @@
 <body>
   <header>
     <nav class="navbar">
-    <div class="nav-left">
-        <a class="title" href="{{ url_for('main.home') }}">Strona notatek</a>
-    </div>
-    <div class="nav-right">
+      <a href="{{ url_for('main.public_home') }}" class="nav-left">
+        <div class="logo">LOGO</div>
+        <div class="brand">NotRapnik</div>
+      </a>
+
+      <div class="nav-center">
+        <a class="title" href="{{ url_for('main.home') }}">StronaNotatek</a>
+      </div>
+
+      <div class="nav-right">
         {% if current_user.is_authenticated %}
-        <a href="{{ url_for('main.logout') }}">Wyloguj</a>
+          <a href="{{ url_for('main.logout') }}">Wyloguj</a>
         {% else %}
-        <a href="{{ url_for('main.login') }}">Zaloguj</a>
-        <a href="{{ url_for('main.signup') }}">Zarejestruj</a>
+          <a href="{{ url_for('main.login') }}">Zaloguj</a>
+          <a href="{{ url_for('main.signup') }}">Zarejestruj</a>
         {% endif %}
-    </div>
+      </div>
     </nav>
   </header>
   <main>
