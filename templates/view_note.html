@@ -2,9 +2,20 @@
 #Auto zapis podczas pisania
 {% extends 'base.html' %}
 {% block content %}
-  <h1 contenteditable id="note-title">{{ note.title }}</h1>
-  <div contenteditable id="note-body" style="white-space: pre-wrap; border:1px solid #ccc; padding:10px;">
-    {{ note.body }}
+  <div class="note-container">
+    <div class="note-header">
+      <span class="note-label">Tytuł</span>
+      <div class="note-dates">
+        <span>Utworzone: {{ note.created_at.strftime('%Y-%m-%d %H:%M') }}</span><br>
+        <span>Ostatnia modyfikacja: {{ note.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+      </div>
+    </div>
+    <h1 contenteditable id="note-title" class="note-title">{{ note.title }}</h1>
+
+    <div class="note-body-wrapper">
+      <span class="note-label">Treść</span>
+      <div contenteditable id="note-body" class="note-body">{{ note.body }}</div>
+    </div>
   </div>
 
   <script>
