@@ -4,137 +4,220 @@
 {% endblock %}
 
 {% block content %}
-<div class="note-page">
-  <div class="note-container">
-    <div class="note-header">
-      <span class="note-label">Tytuł</span>
-      <div class="note-dates">
-        <span>Utworzone: {{ note.created_at.strftime('%Y-%m-%d %H:%M') }}</span><br>
-        <span>Ostatnia modyfikacja:
-          {% if note.updated_at %}
-            {{ note.updated_at.strftime('%Y-%m-%d %H:%M') }}
-          {% else %}
-            {{ note.created_at.strftime('%Y-%m-%d %H:%M') }}
-          {% endif %}
-        </span>
+  <!-- AUDIO PLAYER NAD NOTATKĄ -->
+  <div class="audio-player">
+    <input id="yt-url" type="text" placeholder="Wklej link YouTube">
+    <button id="load-audio">Załaduj</button>
+    <button id="play-pause" disabled>Play</button>
+    <input id="seek" type="range" min="0" max="0" step="0.1" disabled>
+  </div>
+  <div id="yt-audio-player"></div>
+
+  <!-- NOTATKA I SIDEBAR -->
+  <div class="note-page">
+    <div class="note-container">
+      <div class="note-header">
+        <span class="note-label">Tytuł</span>
+        <div class="note-dates">
+          <span>Utworzone: {{ note.created_at.strftime('%Y-%m-%d %H:%M') }}</span><br>
+          <span>Ostatnia modyfikacja:
+            {% if note.updated_at %}
+              {{ note.updated_at.strftime('%Y-%m-%d %H:%M') }}
+            {% else %}
+              {{ note.created_at.strftime('%Y-%m-%d %H:%M') }}
+            {% endif %}
+          </span>
+        </div>
+      </div>
+
+      <h1 id="note-title" class="note-title" contenteditable>{{ note.title }}</h1>
+
+      <div class="note-body-wrapper" style="clear:both; overflow:hidden;">
+        <span class="note-label">Treść</span>
+        <div class="note-body-container">
+          <div class="rows" id="numbers"></div>
+          <textarea id="textBox">{{ note.body }}</textarea>
+          <div id="copyText"></div>
+        </div>
       </div>
     </div>
 
-    <h1 id="note-title" class="note-title" contenteditable>{{ note.title }}</h1>
+    <aside class="note-sidebar">
+      <label for="font-size">Rozmiar czcionki:</label>
+      <input id="font-size" type="number" min="12" max="48" step="1" value="18">
 
-    <div class="note-body-wrapper" style="clear:both; overflow:hidden;">
-      <span class="note-label">Treść</span>
-      <div class="note-body-container">
-        <div class="rows" id="numbers"></div>
-        <textarea id="textBox">{{ note.body }}</textarea>
-        <div id="copyText"></div>
+      <div class="counters">
+        <div>Strof:  <span id="count-stanzas">0</span></div>
+        <div>Wersów: <span id="count-lines">0</span></div>
+        <div>Słów:   <span id="count-words">0</span></div>
       </div>
-    </div>
+    </aside>
   </div>
 
-  <aside class="note-sidebar">
-    <label for="font-size">Rozmiar czcionki:</label>
-    <input id="font-size" type="number" min="12" max="48" step="1" value="18">
+  <!-- EXISTING SCRIPTS: counters, autosave, line numbering -->
+  <script>
+    const nmbrBox = document.getElementById('numbers');
+    const txtBox  = document.getElementById('textBox');
+    const divCopy = document.getElementById('copyText');
+    const sizeIn  = document.getElementById('font-size');
+    const stanzas = document.getElementById('count-stanzas');
+    const lines   = document.getElementById('count-lines');
+    const words   = document.getElementById('count-words');
 
-    <div class="counters">
-      <div>Strof:  <span id="count-stanzas">0</span></div>
-      <div>Wersów: <span id="count-lines">0</span></div>
-      <div>Słów:   <span id="count-words">0</span></div>
-    </div>
-  </aside>
-</div>
-
-<script>
-  const nmbrBox = document.getElementById('numbers');
-  const txtBox  = document.getElementById('textBox');
-  const divCopy = document.getElementById('copyText');
-  const sizeIn  = document.getElementById('font-size');
-  const stanzas = document.getElementById('count-stanzas');
-  const lines   = document.getElementById('count-lines');
-  const words   = document.getElementById('count-words');
-
-  function debounce(fn, delay) {
-    let t;
-    return (...args) => {
-      clearTimeout(t);
-      t = setTimeout(() => fn(...args), delay);
-    };
-  }
-
-  function copyText() {
-    let txt = txtBox.value.replace(/(?:\r\n|\r|\n)/g, '<br />');
-    divCopy.innerHTML = txt;
-  }
-
-  function addLines() {
-    copyText();
-
-    const lineHeight  = parseFloat(getComputedStyle(txtBox).lineHeight);
-    const mirrorH     = divCopy.offsetHeight;
-    const linesCount  = Math.max(1, Math.round(mirrorH / lineHeight));
-
-    let holder = '';
-    for (let i = 1; i <= linesCount; i++) {
-      holder += `<div class="row">${i}.</div>`;
+    function debounce(fn, delay) {
+      let t;
+      return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...args), delay);
+      };
     }
-    nmbrBox.innerHTML = holder;
 
-    txtBox.style.height = 'auto';
-    const scrollH = txtBox.scrollHeight;
-    const minH    = lineHeight * 14;
-    const newH    = Math.max(scrollH, minH);
+    function copyText() {
+      let txt = txtBox.value.replace(/(?:\r\n|\r|\n)/g, '<br />');
+      divCopy.innerHTML = txt;
+    }
 
-    txtBox.style.height  = newH + 'px';
-    nmbrBox.style.height = newH + 'px';
-  }
+    function addLines() {
+      copyText();
 
-  const save = debounce(() => {
-    fetch('/api/notes/{{ note.id }}', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title: document.getElementById('note-title').innerText,
-        body: txtBox.value
-      })
-    });
-  }, 500);
+      const lineHeight  = parseFloat(getComputedStyle(txtBox).lineHeight);
+      const mirrorH     = divCopy.offsetHeight;
+      const linesCount  = Math.max(1, Math.round(mirrorH / lineHeight));
 
-  function counts() {
-  const txt = txtBox.value;
-  stanzas.textContent = txt.trim() ? txt.split(/\n\s*\n/).length : 0;
+      let holder = '';
+      for (let i = 1; i <= linesCount; i++) {
+        holder += `<div class="row">${i}.</div>`;
+      }
+      nmbrBox.innerHTML = holder;
 
-  if (txt.trim()) {
-    const nonEmptyLines = txt.split('\n').filter(line => /\S/.test(line));
-    lines.textContent = nonEmptyLines.length;
-  } else {
-    lines.textContent = 0;
-  }
+      txtBox.style.height = 'auto';
+      const scrollH = txtBox.scrollHeight;
+      const minH    = lineHeight * 14;
+      const newH    = Math.max(scrollH, minH);
 
-  words.textContent   = txt.trim() ? txt.trim().split(/\s+/).length : 0;
-  
-  save();
-}
+      txtBox.style.height  = newH + 'px';
+      nmbrBox.style.height = newH + 'px';
+    }
 
-  function addEvents() {
-    txtBox.addEventListener('input', () => {
-      addLines();
-      counts();
-    });
-    sizeIn.addEventListener('input', () => {
-      const fs = sizeIn.value + 'px';
-      [txtBox, nmbrBox, divCopy].forEach(el => {
-        el.style.fontSize   = fs;
-        el.style.lineHeight = '1.5';
+    const save = debounce(() => {
+      fetch('/api/notes/{{ note.id }}', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: document.getElementById('note-title').innerText,
+          body: txtBox.value
+        })
       });
+    }, 500);
+
+    function counts() {
+      const txt = txtBox.value;
+      stanzas.textContent = txt.trim() ? txt.split(/\n\s*\n/).length : 0;
+
+      if (txt.trim()) {
+        const nonEmptyLines = txt.split('\n').filter(line => /\S/.test(line));
+        lines.textContent = nonEmptyLines.length;
+      } else {
+        lines.textContent = 0;
+      }
+
+      words.textContent = txt.trim() ? txt.trim().split(/\s+/).length : 0;
+      save();
+    }
+
+    function addEvents() {
+      txtBox.addEventListener('input', () => {
+        addLines();
+        counts();
+      });
+      sizeIn.addEventListener('input', () => {
+        const fs = sizeIn.value + 'px';
+        [txtBox, nmbrBox, divCopy].forEach(el => {
+          el.style.fontSize   = fs;
+          el.style.lineHeight = '1.5';
+        });
+        addLines();
+        counts();
+      });
+    }
+
+    window.addEventListener('load', () => {
+      addEvents();
       addLines();
       counts();
     });
-  }
+  </script>
 
-  window.addEventListener('load', () => {
-    addEvents();
-    addLines();
-    counts();
-  });
-</script>
+  <!-- YOUTUBE AUDIO-ONLY PLAYER -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    let ytPlayer, audioReady = false;
+
+    function extractVideoID(url) {
+      const m = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
+      return m ? m[1] : null;
+    }
+
+    const urlInput   = document.getElementById('yt-url');
+    const loadBtn    = document.getElementById('load-audio');
+    const playPause  = document.getElementById('play-pause');
+    const seekSlider = document.getElementById('seek');
+
+    function onYouTubeIframeAPIReady() {
+    }
+
+    loadBtn.addEventListener('click', () => {
+      const id = extractVideoID(urlInput.value.trim());
+      if (!id) {
+        alert('Nieprawidłowy link YouTube');
+        return;
+      }
+      if (ytPlayer) ytPlayer.destroy();
+      ytPlayer = new YT.Player('yt-audio-player', {
+        height: '0', width: '0', videoId: id,
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          disablekb: 1,
+          modestbranding: 1,
+          rel: 0
+        },
+        events: {
+          onReady: e => {
+            audioReady = true;
+            playPause.disabled = false;
+            seekSlider.disabled = false;
+            seekSlider.max = e.target.getDuration();
+          },
+          onStateChange: e => {
+            playPause.textContent =
+              e.data === YT.PlayerState.PLAYING ? 'Play' : 'Play';
+          }
+        }
+      });
+    });
+
+    playPause.addEventListener('click', () => {
+      if (!audioReady) return;
+      const state = ytPlayer.getPlayerState();
+      if (state === YT.PlayerState.PLAYING) {
+        ytPlayer.pauseVideo();
+      } else {
+        ytPlayer.playVideo();
+      }
+    });
+
+    seekSlider.addEventListener('input', () => {
+      if (audioReady) {
+        ytPlayer.seekTo(parseFloat(seekSlider.value), true);
+      }
+    });
+
+    setInterval(() => {
+      if (audioReady && ytPlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+        seekSlider.value = ytPlayer.getCurrentTime();
+      }
+    }, 500);
+  </script>
+
 {% endblock %}
