@@ -162,3 +162,47 @@ textarea#textBox {
   width: calc(100% - 3em);
   box-sizing: border-box;
 }
+
+
+
+
+.audio-player {
+  width: 700px;
+  margin: 20px auto;
+  background: #2a2a2a;
+  padding: 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.audio-player input[type="text"] {
+  flex: 2;
+  padding: 6px;
+  background: #222;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #fff;
+}
+.audio-player button {
+  background: #287bde;
+  border: none;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+.audio-player button:hover {
+  background: #1f65b0;
+}
+.audio-player input[type="range"] {
+  flex: 3;
+  height: 6px;
+  cursor: pointer;
+}
+
+#yt-audio-player,
+#yt-audio-player iframe {
+  display: none !important;
+}

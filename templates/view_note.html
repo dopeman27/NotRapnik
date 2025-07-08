@@ -100,12 +100,20 @@
   }, 500);
 
   function counts() {
-    const txt = txtBox.value;
-    stanzas.textContent = txt.trim() ? txt.split(/\n\s*\n/).length : 0;
-    lines.textContent   = txt ? txt.split(/\n/).length : 0;
-    words.textContent   = txt.trim() ? txt.trim().split(/\s+/).length : 0;
-    save();
+  const txt = txtBox.value;
+  stanzas.textContent = txt.trim() ? txt.split(/\n\s*\n/).length : 0;
+
+  if (txt.trim()) {
+    const nonEmptyLines = txt.split('\n').filter(line => /\S/.test(line));
+    lines.textContent = nonEmptyLines.length;
+  } else {
+    lines.textContent = 0;
   }
+
+  words.textContent   = txt.trim() ? txt.trim().split(/\s+/).length : 0;
+  
+  save();
+}
 
   function addEvents() {
     txtBox.addEventListener('input', () => {
