@@ -102,7 +102,6 @@
   align-items: flex-start;
 }
 
-/* numeracja wierszy */
 .line-numbers {
   user-select: none;
   text-align: right;
@@ -115,9 +114,51 @@
   white-space: pre;
 }
 
-/* pole treści */
 .note-body {
   flex: 1;
   min-height: 300px;
-  /* pozostaw resztę stylów… */
+}
+
+.rows {
+  background: #222;
+  color: #888;
+  font-family: monospace;
+  font-size: 1.15rem;
+  line-height: 1.5;
+  padding: 0.2em 0.5em;
+  text-align: right;
+  width: 3em;
+  user-select: none;
+  float: left;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+textarea#textBox {
+  background: #222;
+  color: #fff;
+  font-family: sans-serif;
+  font-size: 1.15rem;
+  line-height: 1.5;
+  border: none;
+  resize: none;
+  outline: none;
+  width: calc(100% - 3em);
+  overflow: hidden;
+  float: left;
+  box-sizing: border-box;
+  min-height: calc(14 * 1.5em);
+  height: calc(14 * 1.5em);
+}
+#copyText {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  visibility: hidden;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: sans-serif;
+  font-size: 1.15rem;
+  line-height: 1.5;
+  width: calc(100% - 3em);
+  box-sizing: border-box;
 }
